@@ -19,7 +19,8 @@ Compilation:
 2) 'g++ -o diseaseAggregator executive.cpp main.cpp pipes.cpp worker.cpp'
 
 Execution:
-./diseaseAggregator –w <numWorkers> -b <bufferSize> -i <input_dir> 
+
+./diseaseAggregator –w <numWorkers> -b <bufferSize> -i <input_dir>    
 ./diseaseAggregator –w 5 -b 50 -i input_dir 
 
 We are getting the arguments at the command line and we check if they are correct. Then we create the pipes.
@@ -36,31 +37,44 @@ Protocols
 
 protocol 'p' for "path". Executive sends p through pipe then the size of the path in bytes and then the path. 
             then worker executes directoryOpen() that orginize everything inside structures.
+            
 protocol 'l' for "list" and the execution of /ListCoutries command. Sending back to executive "how many countries 
         the worker has". For each country we send first the size of the string (country name) in bytes and then
         the string itself. 
+        
 protocol 's' for "search" and execution of /searchPatientRecord command. Worker reads the string size in bytes and
         then the string (command). Executing the searchPatientRecord() function. The result will be a string with 
         patients recordID name disease age and dates. We send to the executive the size of the string and then the 
         string itself.
+        
 protocol 'a' for "admissions" and execution of /numPatientAdmissions command. Worker reads the number of arguments 
         user gave. Then the string size (command) in bytes and then the string. Based on the number of argumetns the 
         result is different.
+        
 protocol 'd' for "discharges" and execution of /numPatientDischarges command. Same protocol as 'a'.
+
 protocol 'f' for "frequency" and execution of /diseaseFrequency command.  Worker reads the number of arguments 
         user gave. Then the string size (command) in bytes and then the string. Based on the number of argumetns the 
         result is different. If arguments contain "country" then we execute FrequencySpecific() function else Frequency()
         function. We send back to the executive a string (number). First we send the size of the string and then the 
         string itself. If we want for more than one country we executite it as many times as the countries each worker 
         has. 
+        
 protocol 'k' for "topk.." it works but it has some bugs and sometime prints wrong result.
 
 To terminate the program we use /exit command. While typing exit the application get a kill signal end terminates.
-Shutting_down() function 1) kill all the worker processes, 2) closes all the pipes between executive and workers,
+Shutting_down() function:
+
+1) kill all the worker processes, 
+
+2) closes all the pipes between executive and workers,
+
 3) deallocate all the memory and 4) remove all the pipes. Before all these things happen the workers create logfiles 
 with statistics. 
 
 WHAT MY logfiles SHOW..!
+
 ------------------------
+
 Each worker create his own logfile with the extension .XXXX in wich XXXX is the worker/process ID. The lofiles contain 
 statistics about how many reads + writes succed (SUCCESS), failed (FAIL), and the total amount (TOTAL).
